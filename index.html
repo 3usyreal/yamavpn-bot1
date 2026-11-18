@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex">
+<title>YamaVPN: подключение</title>
+<style>
+  :root { --bg:#f6f7fb; --card:#fff; --text:#16181d; --muted:#5b6270; --accent:#4f46e5; --line:#e3e6ee; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#111318; --card:#1b1e26; --text:#eceef3; --muted:#a2a9b8; --accent:#7c83ff; --line:#2b2f3a; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; padding:max(24px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom));
+         background:var(--bg); color:var(--text); font:16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  main { max-width:420px; margin:0 auto; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:20px; }
+  h1 { font-size:20px; margin:0 0 6px; }
+  p { margin:0 0 12px; color:var(--muted); }
+  button, a.btn { display:block; width:100%; margin:10px 0 0; padding:14px; border-radius:12px; border:1px solid var(--line);
+         background:var(--card); color:var(--text); font:inherit; font-weight:600; text-align:center; text-decoration:none; }
+  button.primary { background:var(--accent); border-color:var(--accent); color:#fff; }
+  .note { font-size:14px; margin-top:16px; }
+  .host { word-break:break-all; font-family:ui-monospace, Menlo, monospace; font-size:13px; }
+  [hidden] { display:none !important; }
+</style>
+</head>
+<body>
+<main>
+  <div class="card" id="ok" hidden>
+    <h1 id="title">Подключение</h1>
+    <p>Подписка: <span class="host" id="host"></span></p>
+    <button class="primary" id="open">Открыть в приложении</button>
+    <button id="copy">Скопировать ссылку подписки</button>
+    <p class="note">Если приложение не открылось: установите его, вернитесь на эту страницу и нажмите кнопку ещё раз. Если страница открыта внутри Telegram, выберите в меню «Открыть в браузере».</p>
+  </div>
+  <div class="card" id="bad" hidden>
+    <h1>Ссылка недействительна</h1>
+    <p>Вернитесь в бот и нажмите кнопку подключения ещё раз.</p>
+  </div>
+</main>
+<script>
+(function () {
+  // Адрес подписки передаётся во фрагменте (#...): он не уходит на сервер.
+  var ALLOWED_HOSTS = ["h1clayd.click"];   // разрешённые домены подписок (с поддоменами)
+  var NAME = "YamaVPN";
+  var APPS = {
+    karing: { title: "Karing", link: function (u) { return "karing://install-config?url=" + encodeURIComponent(u) + "&name=" + encodeURIComponent(NAME); } },
+    happ:   { title: "Happ",   link: function (u) { return "happ://add/" + u; } },
+    incy:   { title: "Incy",   link: function (u) { return "incy://import/" + u; } }
+  };
+
+  function show(id) { document.getElementById(id).hidden = false; }
+
+  var params = new URLSearchParams(location.hash.replace(/^#/, ""));
+  var app = APPS[params.get("app")];
+  var sub = params.get("u") || "";
+  var url;
+  try { url = new URL(sub); } catch (e) { url = null; }
+
+  var hostOk = url && url.protocol === "https:" && ALLOWED_HOSTS.some(function (h) {
+    return url.hostname === h || url.hostname.endsWith("." + h);
+  });
+  if (!app || !hostOk) { show("bad"); return; }
+
+  var deep = app.link(sub);
+  document.getElementById("title").textContent = "Подключение в " + app.title;
+  document.getElementById("host").textContent = url.hostname;
+  document.getElementById("open").textContent = "Открыть в " + app.title;
+  document.getElementById("open").onclick = function () { location.href = deep; };
+  document.getElementById("copy").onclick = function () {
+    var btn = this;
+    function done() { btn.textContent = "Ссылка скопирована"; }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(sub).then(done, fallback);
+    } else { fallback(); }
+    function fallback() {
+      var t = document.createElement("textarea");
+      t.value = sub; document.body.appendChild(t); t.select();
+      try { document.execCommand("copy"); done(); } catch (e) { btn.textContent = "Скопируйте вручную из бота"; }
+      document.body.removeChild(t);
+    }
+  };
+  show("ok");
+  // Автоматическая попытка открыть приложение.
+  setTimeout(function () { location.href = deep; }, 400);
+})();
+</script>
+</body>
+</html>
