@@ -4,12 +4,12 @@ import re
 import shutil
 
 SERVERS = (
-    "🇵🇱 Польша|TCP, gRPC, XHTTP, Hysteria2;"
-    "🇩🇪 Германия|TCP, gRPC, XHTTP, Hysteria2;"
+    "🇵🇱 Польша|TCP, XHTTP, Hysteria2;"
+    "🇩🇪 Германия|TCP, XHTTP, Hysteria2;"
     "🇳🇱 Нидерланды|TCP, gRPC, XHTTP;"
-    "🇫🇮 Финляндия|TCP, gRPC, XHTTP, Hysteria2;"
-    "🇪🇪 Эстония|TCP, gRPC, XHTTP, Hysteria2;"
-    "🇸🇪 Швеция|TCP, gRPC, XHTTP, Hysteria2"
+    "🇫🇮 Финляндия|TCP, XHTTP, Hysteria2;"
+    "🇪🇪 Эстония|TCP, XHTTP, Hysteria2;"
+    "🇸🇪 Швеция|TCP, XHTTP, Hysteria2"
 )
 
 NEW_HELP = r'''HELP_TEXT = (
@@ -30,8 +30,8 @@ NEW_HELP = r'''HELP_TEXT = (
     "<b>3️⃣ Разрешите VPN-конфигурацию</b> при первом запуске на iPhone.\n\n"
     "<b>4️⃣ Включите соединение</b> и выберите сервер.\n\n"
     "<b>🌍 Серверы</b>\n"
-    "В подписке серверы в шести странах. Если один не работает, выберите другой или другой тип подключения "
-    "(TCP, gRPC, XHTTP, Hysteria2).\n"
+    "В подписке серверы в шести странах, у каждого несколько типов подключения. "
+    "Если один сервер не работает, выберите другой или другой тип подключения.\n"
     "<i>Hysteria2 отображается в Happ и Karing, в Incy такие серверы не показываются.</i>\n\n"
     "<b>🛠 Не подключается?</b>\n"
     "• Обновите подписку в приложении (значок обновления)\n"
